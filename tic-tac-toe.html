@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/reset.css">
+	<link rel="stylesheet" href="css/style.css">
+    <title>Home</title>
+</head>
+<body>
+    <a class="skip-main" href = "#main">Skip to Main Content</a>
+    <header>
+        <img alt = "Sandra's Game Station Logo with Domino graphic" id = logo src = "./images/logo.png">
+        <nav>
+            <ul>
+                <li class="active"><a href = "index.html">home</a></li>
+                <li><a href = "tic-tac-toe.html">tic-tac-toe</a></li>
+                <li><a href = "checkers.html">checkers</a></li>
+                <li><a href = "sudoku.html">sudoku</a></li>
+                <!-- <li><a href = "nonogram.html">nonogram</a></li> -->
+            </ul>
+        </nav>
+        <!-- <h1>Sandra's Game Station</h1> -->
+    </header>
+    <main id="main">
+        <h1>tic-toc-toe</h1>
+    <div class = "container">
+
+        <div class = "board">
+            <div class = "square" id = "left-top" tabindex="0" onclick="playerMoved(0)">
+            </div>
+            <div class = "square" id = "center-top" tabindex="0" onclick="playerMoved(1)">
+            </div>
+            <div class = "square" id = "right-top" tabindex="0" onclick="playerMoved(2)">
+            </div>
+            <div class =  "square" id = "left-middle" tabindex="0" onclick="playerMoved(3)">
+            </div>
+            <div class =  "square" id = "center-middle" tabindex="0" onclick="playerMoved(4)">
+            </div>
+            <div class =  "square" id = "right-middle" tabindex="0" onclick="playerMoved(5)">
+            </div>
+            <div class =  "square" id = "left-bottom" tabindex="0" onclick="playerMoved(6)">
+            </div>
+            <div class =  "square" id = "center-bottom" tabindex="0" onclick="playerMoved(7)">
+            </div>
+            <div class =  "square" id = "right-bottom" tabindex="0" onclick="playerMoved(8)">
+            </div>
+        </div>
+        <script src="js/script.js"></script>
+        <div class = "scoreboard">
+            <div class = "message">
+                Welcome!
+            </div>
+            <div class="player-mode-buttons">
+                <button id="one-player-mode" onclick="toggleplayer(1)">one player</button>
+                <button id="two-player-mode" class = "selected-player" onclick="toggleplayer(2)">two players</button>
+                <button id="reset-button">reset game</button>
+                <button id="toggle-classic">flashy mode on</button>
+            </div>
+            <!-- <div class = "player" id = "player1">
+                <h2>player 1</h2>
+            </div> -->
+        </div>
+    </div>
+            <!-- Sandra Klocinski-->
+    </main>
+    <footer>	
+        <p>University of Michigan </p>	
+        <p>&copy; Sandra Klocinski - Web Design 2024</p>	
+    </footer>
+</body>
+
+</html>
