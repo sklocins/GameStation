@@ -471,28 +471,35 @@ document.addEventListener('DOMContentLoaded', function() {
     function chaining(){
         //checks to see if filling in a square would cause a chain
         //reaction that created a board that broke the rules
-        let count = 1;
         chaining_check_mode_on = true;
         let temp_blank_squares = deepCopy(blank_squares);
         let temp_game_list = deepCopy(game_list);
         let temp_move_log = deepCopy(move_log);
         let sorted_blanks = sortByPossibleValues(blank_squares);
-
-        // for (let val of game_list[sorted_blanks[0]]){
-        chaining_check_mode_on = true;
-        console.log("Candidate: ", sorted_blanks[0], " val: ", game_list[sorted_blanks[0]][1]);
-        update_game(sorted_blanks[0], [], [], [game_list[sorted_blanks[0]][1]]);
-        while(make_move()){
-            console.log(count);
-            count++;
+        for (let sq of sorted_blanks){
+            for (let val of game_list[sq]){
+                revert(temp_blank_squares, temp_game_list, temp_move_log);
+                chaining_check_mode_on = true;
+                let index = sq;
+                let value = val;
+                console.log("Candidate: ", index, " val: ", value);
+                update_game(index, [], [], [value]);
+                let stop = false;
+                while(make_move() && !stop){
+                    stop = check_for_loss() || check_for_win();
+                }
+                // console.log("loss? ", check_for_loss());
+                // console.log("win? ", check_for_win());
+                if(check_for_loss()){
+                    console.log("Loss. Removing ", value , " from ", index ,".")
+                    revert(temp_blank_squares, temp_game_list, temp_move_log);
+                    update_game("-", [], [index], [value]);
+                    return true;
+                }
+            }
         }
-        console.log("loss? ", check_for_loss());
-        console.log("win? ", check_for_win());
-        // if(check_for_loss() || check_for_win()){
-        //     break;
-        // }
-        // revert(temp_blank_squares, temp_game_list, temp_move_log);
-        // }
+        revert(temp_blank_squares, temp_game_list, temp_move_log);
+        return false;
     }
     function revert(temp_blank_squares, temp_game_list, temp_move_log){
         //temp function to revert chaining
