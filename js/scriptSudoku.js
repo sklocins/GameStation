@@ -1,38 +1,32 @@
 document.addEventListener('DOMContentLoaded', function() {
     const squares = document.querySelectorAll('.square');
     const all_options = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-//    const orig_game_list = ['-',  2 ,  8 , '-', '-', '-',  7 , '-', '-',
-//                            '-', '-',  7 , '-', '-', '-', '-',  9 ,  3 ,
-//                            '-', '-', '-', '-', '-', '-',  4 , '-', '-',
-//                            '-', '-',  4 , '-', '-', '-',  3 , '-',  5 ,
-//                            '-', '-', '-', '-', '-',  5 , '-',  1 , '-',
-//                            '-',  8 , '-',  1 ,  6 ,  9 , '-', '-', '-',
-//                            '-', '-', '-', '-',  1 , '-', '-', '-',  9 ,
-//                             5 , '-', '-', '-', '-', '-', '-',  3 , '-',
-//                            '-', '-',  9 ,  2 , '-',  4 , '-', '-', '-'];
-    const orig_game_list = ['-',  2 ,  8 , '-', '-', '-',  7 , '-', '-',
-                            '-', '-',  7 , '-', '-', '-', '-',  9 ,  3 ,
-                            '-', '-', '-', '-', '-', '-',  4 , '-', '-',
-                            '-', '-',  4 , '-', '-', '-',  3 , '-',  5 ,
-                            '-', '-', '-', '-', '-',  5 , '-',  1 , '-',
-                            '-',  8 , '-',  1 ,  6 ,  9 , '-', '-', '-',
-                            '-', '-', '-', '-',  1 , '-', '-', '-',  9 ,
-                            5 , '-', '-', '-', '-', '-', '-',  3 , '-',
-                            '-', '-',  9 ,  2 , '-',  4 , '-', '-', '-'];
-    // const orig_game_list = [ 3 ,  9 , '-', '-',  7 , '-', '-', '-',  5 ,
-    // '-', '-', '-', '-', '-',  3 , '-', '-',  2 ,
-    // '-', '-', '-',  4 ,  1 , '-', '-', '-', '-',
-    // '-',  5 , '-', '-', '-', '-',  2 , '-', '-',
-    // 6 , '-',  9 , '-', '-', '-',  7 , '-',  4 ,
-    // '-', '-',  4 , '-', '-', '-', '-',  1 , '-',
-    // '-', '-', '-', '-',  3 ,  2 , '-', '-', '-',
-    // 7 , '-', '-',  6 , '-', '-', '-', '-', '-',
-    // 2 , '-', '-', '-',  5 , '-', '-',  4 ,  8 ];
+    // const orig_game_list = ['-',  2 ,  8 , '-', '-', '-',  7 , '-', '-',
+    //                         '-', '-',  7 , '-', '-', '-', '-',  9 ,  3 ,
+    //                         '-', '-', '-', '-', '-', '-',  4 , '-', '-',
+    //                         '-', '-',  4 , '-', '-', '-',  3 , '-',  5 ,
+    //                         '-', '-', '-', '-', '-',  5 , '-',  1 , '-',
+    //                         '-',  8 , '-',  1 ,  6 ,  9 , '-', '-', '-',
+    //                         '-', '-', '-', '-',  1 , '-', '-', '-',  9 ,
+    //                         5 , '-', '-', '-', '-', '-', '-',  3 , '-',
+    //                         '-', '-',  9 ,  2 , '-',  4 , '-', '-', '-'];
+    const orig_game_list = [ 3 ,  9 , '-', '-',  7 , '-', '-', '-',  5 ,
+                            '-', '-', '-', '-', '-',  3 , '-', '-',  2 ,
+                            '-', '-', '-',  4 ,  1 , '-', '-', '-', '-',
+                            '-',  5 , '-', '-', '-', '-',  2 , '-', '-',
+                            6 , '-',  9 , '-', '-', '-',  7 , '-',  4 ,
+                            '-', '-',  4 , '-', '-', '-', '-',  1 , '-',
+                            '-', '-', '-', '-',  3 ,  2 , '-', '-', '-',
+                            7 , '-', '-',  6 , '-', '-', '-', '-', '-',
+                            2 , '-', '-', '-',  5 , '-', '-',  4 ,  8 ];
     let game_list = [];
     let blank_squares = [];
     let move_log = [];
     let selected_num = 0;
+    let chaining_check_mode_on = false;
+    let game_won = false;
     setup();
+    // console.log(sortByPossibleValues(blank_squares));
 
     document.getElementById('move-button').addEventListener('click', make_move);
     document.getElementById('undo-button').addEventListener('click', undo_move);
@@ -72,6 +66,8 @@ document.addEventListener('DOMContentLoaded', function() {
         game_list = [...orig_game_list];
         blank_squares = [];
         move_log = [];
+        let chaining_check_mode_on = false;
+        let game_won = false;
         for (let i = 0; i < 81; i++) {
             if(game_list[i] != '-'){
                 squares[i].innerText = game_list[i];
@@ -131,6 +127,27 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         return null;
+    }
+    function check_for_win(){ 
+        //check to se if there is a win
+        if(blank_squares.length == 0){
+            game_won = true;
+            if (!chaining_check_mode_on){
+                console.log("You won!!!!")
+                return true;
+            }
+        }
+        return false;
+    }
+    function check_for_loss(){ 
+        //check to se if the board is directly invalid
+        for (let square of blank_squares){
+            if(game_list[square].length == 0){
+                console.log("WOAH! It's saying ", square, "would be optionless! Loss!")
+                return true;
+            }
+        }
+        return false;
     }
     function get_col(index){    //return the column # of an index
         return index % 9;
@@ -229,6 +246,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         return resultant_list;
     }
+    function deepCopy(list) {
+        if (!Array.isArray(list)) {
+            return list;
+        }
+        let copiedList = [];
+        for (let i = 0; i < list.length; i++) {
+            copiedList.push(deepCopy(list[i]));
+        }
+        return copiedList;
+    }
     function make_move() {
         //either fills in a value or removes an option from a group
         let sq_to_change = check_for_one_option();
@@ -301,6 +328,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if(update_game("-", my_answer[2], my_answer[3] ,my_answer[1])){
                 return true;
             }
+        }
+        if(chaining_check_mode_on == false){
+            console.log("chaining on...")
+            chaining();
         }
         console.log("uh oh")
         highlight_num(selected_num);
@@ -436,5 +467,62 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         return [false, [], [], rcg_sqs];
+    }
+    function chaining(){
+        //checks to see if filling in a square would cause a chain
+        //reaction that created a board that broke the rules
+        let count = 1;
+        chaining_check_mode_on = true;
+        let temp_blank_squares = deepCopy(blank_squares);
+        let temp_game_list = deepCopy(game_list);
+        let temp_move_log = deepCopy(move_log);
+        let sorted_blanks = sortByPossibleValues(blank_squares);
+
+        // for (let val of game_list[sorted_blanks[0]]){
+        chaining_check_mode_on = true;
+        console.log("Candidate: ", sorted_blanks[0], " val: ", game_list[sorted_blanks[0]][1]);
+        update_game(sorted_blanks[0], [], [], [game_list[sorted_blanks[0]][1]]);
+        while(make_move()){
+            console.log(count);
+            count++;
+        }
+        console.log("loss? ", check_for_loss());
+        console.log("win? ", check_for_win());
+        // if(check_for_loss() || check_for_win()){
+        //     break;
+        // }
+        // revert(temp_blank_squares, temp_game_list, temp_move_log);
+        // }
+    }
+    function revert(temp_blank_squares, temp_game_list, temp_move_log){
+        //temp function to revert chaining
+        chaining_check_mode_on = false;
+        blank_squares = deepCopy(temp_blank_squares);
+        game_list = deepCopy(temp_game_list);
+        move_log = deepCopy(temp_move_log);
+        console.log("Blanks: ", blank_squares);
+        console.log("Gamelist: ", game_list);
+        console.log("Movelog: ", move_log);
+        // fill_in_value(blank_squares[0], game_list[blank_squares[0]]);
+        for (let i = 0; i < 81; i++){
+            if(blank_squares.includes(i)){
+                squares[i].innerText = game_list[i].join(' ');
+                squares[i].style.fontSize = "18px";
+            }
+            else{
+                squares[i].innerText = game_list[i];
+                squares[i].style.fontSize = "5vw";
+            }
+        }
+        highlight_num(selected_num);
+    }
+    function sortByPossibleValues(blanks) {
+        // Sort the blank squares array based on the length of the list at the corresponding index in gameList
+        blanks.sort((index1, index2) => {
+            const possibleValues1 = Array.isArray(game_list[index1]) ? game_list[index1].length : 0;
+            const possibleValues2 = Array.isArray(game_list[index2]) ? game_list[index2].length : 0;
+            return possibleValues1 - possibleValues2;
+        });
+        return blanks;
     }
 });
